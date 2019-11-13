@@ -7,11 +7,11 @@
 Scheduler userScheduler; // to control your personal task
 painlessMesh  mesh;
 
-const int trigPin1 = 4;
-const int echoPin1 = 16;
+const int trigPin1 = 33;
+const int echoPin1 = 25;
 
-const int trigPin2 = 25;
-const int echoPin2 = 26;
+const int trigPin2 = 35;
+const int echoPin2 = 32;
 
 int isOccupied = 0;
 int newHigh = 0;
@@ -75,6 +75,11 @@ void loop() {
   SonarSensor(trigPin2, echoPin2);
   BackSensor = distance;
 
+  //Serial.println(FrontSensor);
+  //Serial.println(BackSensor);
+  //Serial.println("");
+  delay(100);
+
   difference = FrontSensor - BackSensor;
 
   if (difference > newHigh)
@@ -85,21 +90,23 @@ void loop() {
   {
     newLow = difference;
   }
-  /*
-  Serial.print("new high = ");
+  
+  /*Serial.print("new high = ");
   Serial.println(newHigh);
   Serial.print("new low = ");
-  Serial.println(newLow); 
-  delay(100); */
-  
-  if (FrontSensor - BackSensor > 50)
+  Serial.println(newLow); */
+  //Serial.println(difference);
+  //delay(100); 
+
+ 
+  if (difference < -20 )
   {
     isOccupied = 1;
     Serial.println("Forward IN");
     Serial.println("");
     delay(2000);
   }
-  else if (BackSensor - FrontSensor > 50)
+  else if (difference > 20)
   {
     isOccupied = 1;
     Serial.println("Backward OUT");
