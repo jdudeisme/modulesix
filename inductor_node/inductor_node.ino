@@ -1,14 +1,26 @@
+//************************************************************
+// this is a simple example that uses the painlessMesh library
+//
+// 1. sends a silly message to every node on the mesh at a random time between 1 and 5 seconds
+// 2. prints anything it receives to Serial.print
+//
+//
+//************************************************************
 #include "painlessMesh.h"
 
 #define   MESH_PREFIX     "TheBees"
 #define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
 
-const int Fridge = 4;
-int valFridge = 0;
+int ind_pin = 15;
+float lastFive[5] = {0,0,0,0,0};
+int fiveInd = 0;
+float diff = 200.0;
+int wasOn= 0;
+int toSend = 0;
 
 Scheduler userScheduler; // to control your personal task
-painlessMesh mesh;
+painlessMesh  mesh;
 
 // User stub
 void sendMessage() ; // Prototype so PlatformIO doesn't complain
@@ -16,36 +28,39 @@ void sendMessage() ; // Prototype so PlatformIO doesn't complain
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
-  //Update message here 
-  String msg = " Jordy ";
+
+  float avg = (lastFive[0] + lastFive[1] + lastFive[2] + lastFive[3] + lastFive[4])/5;
+
+  String msg = "Microwave ";
+  lastFive[fiveInd] = analogRead(ind_pin);
+  fiveInd = (fiveInd + 1) %5;
+  
+  if(wasOn == 0 && abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
+    abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff){
+      wasOn = 1;
+      msg += "On";
+      toSend = 1;
+    }
+  else if(wasOn == 1 && !(abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
+    abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff)){
+      wasOn = 0;
+      msg += "Off";
+      toSend = 1;
+    }
+  
   //msg += mesh.getNodeId();
-  msg += valFridge; 
-  if (valFridge < 20 ){
-    msg += " Touched";
-  }else{
-    msg += " Released";
+  float val = analogRead(ind_pin);
+  msg += val;
+  if(toSend == 1){
+    mesh.sendBroadcast( msg );
+    toSend = 0;
   }
-  mesh.sendBroadcast( msg );
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
 // Needed for painless library
 void receivedCallback( uint32_t from, String &msg ) {
   Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
-  switch(from) { // checking where the message came from 
-    case 0:
-      // statements
-      break;
-    case 1: 
-      // statements
-      break;
-    case 2:
-      // statements
-      break;
-    case 3: 
-      // statements
-      break;
-  }
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -63,9 +78,6 @@ void nodeTimeAdjustedCallback(int32_t offset) {
 void setup() {
   Serial.begin(115200);
 
-  pinMode (Fridge, INPUT);
-  
-
 //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
   mesh.setDebugMsgTypes( ERROR | STARTUP );  // set before init() so that you can see startup messages
 
@@ -77,13 +89,13 @@ void setup() {
 
   userScheduler.addTask( taskSendMessage );
   taskSendMessage.enable();
+
+  pinMode(15, INPUT);
 }
 
 void loop() {
   // it will run the user scheduler as well
   mesh.update();
-  valFridge = touchRead(Fridge);
-  //Serial.println(valFridge);
-  delay(200);
-  
+  //Serial.print(String(analogRead(ind_pin)) + "\n");
+  //Serial.print("still runnin'\n");
 }
