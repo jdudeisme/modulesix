@@ -1,7 +1,7 @@
 #include "painlessMesh.h"
 
 #define   MESH_PREFIX     "TheBees"
-#define   MESH_PASSWORD   "password"
+#define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
 
 Scheduler userScheduler; // to control your personal task
@@ -26,7 +26,7 @@ void sendMessage() ; // Prototype so PlatformIO doesn't complain
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
-  String msg = "Hello from node ";
+  String msg = "fart";
   msg += mesh.getNodeId();
   mesh.sendBroadcast( msg );
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
@@ -102,22 +102,22 @@ void loop() {
   if (difference < -20 )
   {
     isOccupied = 1;
-    Serial.println("Forward IN");
-    Serial.println("");
+    //Serial.println("Forward IN");
+    //Serial.println("");
     delay(2000);
   }
   else if (difference > 20)
   {
     isOccupied = 1;
-    Serial.println("Backward OUT");
-    Serial.println("");
+    //Serial.println("Backward OUT");
+    //Serial.println("");
     delay(2000);
   }
   if (isOccupied == 1 && ((FrontSensor - BackSensor < 10) || (BackSensor - FrontSensor < 10)))
   {
     isOccupied = 0;
-    Serial.println("RESET"); 
-    Serial.println("");
+    //Serial.println("RESET"); 
+    //Serial.println("");
   } 
 
 
