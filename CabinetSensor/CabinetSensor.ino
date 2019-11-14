@@ -12,6 +12,9 @@
 #define   MESH_PASSWORD   "password"
 #define   MESH_PORT       5555
 
+const int CABINET = 34;
+bool opened = false;
+
 Scheduler userScheduler; // to control your personal task
 painlessMesh  mesh;
 
@@ -23,6 +26,10 @@ Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 void sendMessage() {
   //Update message here 
   String msg = "";
+  if (opened)
+    msg = "open";
+  else
+    msg = "closed";
   msg += mesh.getNodeId();
   mesh.sendBroadcast( msg );
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
@@ -62,6 +69,7 @@ void nodeTimeAdjustedCallback(int32_t offset) {
 void setup() {
   Serial.begin(115200);
 
+  pinMode(CABINET, INPUT);
 //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
   mesh.setDebugMsgTypes( ERROR | STARTUP );  // set before init() so that you can see startup messages
 
@@ -76,6 +84,10 @@ void setup() {
 }
 
 void loop() {
+  if (digitalRead(CABINET) == 1)
+    opened = false;
+  else 
+    opened = true; 
   // it will run the user scheduler as well
   mesh.update();
 }
