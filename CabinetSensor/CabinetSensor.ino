@@ -9,14 +9,16 @@
 #include "painlessMesh.h"
 
 #define   MESH_PREFIX     "TheBees"
-#define   MESH_PASSWORD   "password"
+#define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
 
 const int CABINET = 34;
+bool prevVal = false;
 bool opened = false;
 
 Scheduler userScheduler; // to control your personal task
-painlessMesh  mesh;
+painlessMesh mesh;
+String msg = "";
 
 // User stub
 void sendMessage() ; // Prototype so PlatformIO doesn't complain
@@ -24,15 +26,26 @@ void sendMessage() ; // Prototype so PlatformIO doesn't complain
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
-  //Update message here 
-  String msg = "";
-  if (opened)
-    msg = "open";
-  else
-    msg = "closed";
-  msg += mesh.getNodeId();
-  mesh.sendBroadcast( msg );
-  taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+  Serial.println(TASK_SECOND);
+  if (digitalRead(CABINET) == 1) {    
+    prevVal = opened;
+    opened = false;
+  }
+  else {
+    prevVal = opened;
+    opened = true; 
+  } 
+
+  if (prevVal != opened) {
+    if (opened)
+      msg = "Open";
+    else
+      msg = "Closed";
+    
+    mesh.sendBroadcast( msg );
+  }
+  //taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+  
 }
 
 // Needed for painless library
@@ -84,10 +97,5 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(CABINET) == 1)
-    opened = false;
-  else 
-    opened = true; 
-  // it will run the user scheduler as well
   mesh.update();
 }
