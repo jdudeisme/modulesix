@@ -57,16 +57,16 @@ while True:
 
 		if(counter == dProbs[dPhase]):
 			probster = random.randint(1,5)
-			if(probster == 1 || probster == 2):
+			if(probster == 1 or probster == 2):
 				ser.write(b'In')
-			if(probster == 3 || probster == 4):
+			if(probster == 3 or probster == 4):
 				ser.write(b'Out')
 			if(probster == 5):
 				ser.write(b'None')
 
 
 		sleep(1)
-		counter++
+		counter+=1
 
 	counter = 1
 
