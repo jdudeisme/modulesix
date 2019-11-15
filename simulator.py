@@ -58,11 +58,11 @@ while True:
 		if(counter == dProbs[dPhase]):
 			probster = random.randint(1,5)
 			if(probster == 1 || probster == 2):
-				ser.write(b'IN')
+				ser.write(b'In')
 			if(probster == 3 || probster == 4):
-				ser.write(b'OUT')
+				ser.write(b'Out')
 			if(probster == 5):
-				ser.write(b'NONE')
+				ser.write(b'None')
 
 
 		sleep(1)
