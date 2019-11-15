@@ -18,6 +18,10 @@ int newHigh = 0;
 int newLow = 0;
 int difference = 0;
 
+int wasOn= 0;
+int toSend = 0;
+
+
 long duration, distance, BackSensor,FrontSensor;
 
 // User stub
@@ -26,9 +30,26 @@ void sendMessage() ; // Prototype so PlatformIO doesn't complain
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
-  String msg = "fart";
+  String msg = "NONE";
   msg += mesh.getNodeId();
-  mesh.sendBroadcast( msg );
+  
+  if(toSend == 1)
+  {
+    wasOn = 1;
+    msg = "IN";
+    mesh.sendBroadcast( msg );
+    msg = "NONE";
+    toSend = 0;
+  }
+
+  if(toSend == 2)
+  {
+    wasOn = 1;
+    msg = "OUT";
+    mesh.sendBroadcast( msg );
+    msg = "NONE";
+    toSend = 0;
+  }
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
@@ -75,9 +96,9 @@ void loop() {
   SonarSensor(trigPin2, echoPin2);
   BackSensor = distance;
 
-  //Serial.println(FrontSensor);
-  //Serial.println(BackSensor);
-  //Serial.println("");
+  Serial.println(FrontSensor);
+  Serial.println(BackSensor);
+  Serial.println("");
   delay(100);
 
   difference = FrontSensor - BackSensor;
@@ -102,6 +123,7 @@ void loop() {
   if (difference < -20 )
   {
     isOccupied = 1;
+    toSend = 1;
     //Serial.println("Forward IN");
     //Serial.println("");
     delay(2000);
@@ -109,6 +131,7 @@ void loop() {
   else if (difference > 20)
   {
     isOccupied = 1;
+    toSend = 2;
     //Serial.println("Backward OUT");
     //Serial.println("");
     delay(2000);
