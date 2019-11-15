@@ -9,7 +9,7 @@
 #include "painlessMesh.h"
 
 #define   MESH_PREFIX     "TheBees"
-#define   MESH_PASSWORD   "password"
+#define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
 
 Scheduler userScheduler; // to control your personal task
@@ -21,8 +21,8 @@ void sendMessage() ; // Prototype so PlatformIO doesn't complain
 Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
-  //Update message here 
-  String msg = "";
+  //Update message here
+  String msg = "This is Cynthia";
   msg += mesh.getNodeId();
   mesh.sendBroadcast( msg );
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
@@ -31,24 +31,29 @@ void sendMessage() {
 // Needed for painless library
 void receivedCallback( uint32_t from, String &msg ) {
   Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
-  switch(from) { // checking where the message came from 
-    case 0:
-      // statements
+  switch (msg.c_str()) { // checking where the message came from
+    case "Touched":
+    case "Released":
+      Serial.println("Fridge activated");
       break;
-    case 1: 
-      // statements
+    case "IN":
+    case "OUT":
+    case "NONE":
+      Serial.println("Door activated");
       break;
-    case 2:
-      // statements
+    case "On":
+    case "Off":
+      Serial.println("Microwave activated");
       break;
-    case 3: 
-      // statements
+    case "Open":
+    case "Closed":
+      Serial.println("Cabinet activated");
       break;
   }
 }
 
 void newConnectionCallback(uint32_t nodeId) {
-    Serial.printf("--> startHere: New Connection, nodeId = %u\n", nodeId);
+  Serial.printf("--> startHere: New Connection, nodeId = %u\n", nodeId);
 }
 
 void changedConnectionCallback() {
@@ -56,13 +61,13 @@ void changedConnectionCallback() {
 }
 
 void nodeTimeAdjustedCallback(int32_t offset) {
-    Serial.printf("Adjusted time %u. Offset = %d\n", mesh.getNodeTime(),offset);
+  Serial.printf("Adjusted time %u. Offset = %d\n", mesh.getNodeTime(), offset);
 }
 
 void setup() {
   Serial.begin(115200);
 
-//mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
+  //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
   mesh.setDebugMsgTypes( ERROR | STARTUP );  // set before init() so that you can see startup messages
 
   mesh.init( MESH_PREFIX, MESH_PASSWORD, &userScheduler, MESH_PORT );
