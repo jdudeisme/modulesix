@@ -1,9 +1,9 @@
 # Module 6 Task 1 - Distributed Networks 
 
-##Members  
+## Members  
 Carlos Guanche, Jordan Smith, Cynthia Vu, TanTan Wang  
 
-##Sensors and Setup  
+## Sensors and Setup  
 As a four person team, we used four ESP32 devices to create four distinct sensors.  
 
 - Cabinet Sensor  
