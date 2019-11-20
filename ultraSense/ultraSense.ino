@@ -27,7 +27,7 @@ long duration, distance, BackSensor,FrontSensor;
 // User stub
 void sendMessage() ; // Prototype so PlatformIO doesn't complain
 
-Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
+Task taskSendMessage( TASK_SECOND * 0.2 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
   String msg = "NONE";
@@ -51,7 +51,7 @@ void sendMessage() {
     msg = "NONE";
     toSend = 0;
   } */
-  taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+  //taskSendMessage.setInterval( TASK_SECOND * 0.2);
 }
 
 // Needed for painless library
