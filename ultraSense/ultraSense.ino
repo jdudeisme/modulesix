@@ -39,9 +39,10 @@ void sendMessage() {
     msg = "IN";
     mesh.sendBroadcast( msg );
     msg = "NONE";
+    Serial.println("IN");
     toSend = 0;
   }
-
+/*
   if(toSend == 2)
   {
     wasOn = 1;
@@ -49,7 +50,7 @@ void sendMessage() {
     mesh.sendBroadcast( msg );
     msg = "NONE";
     toSend = 0;
-  }
+  } */
   taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
@@ -97,11 +98,11 @@ void loop() {
   BackSensor = distance;
 
   Serial.println(FrontSensor);
-  Serial.println(BackSensor);
-  Serial.println("");
-  delay(100);
+  //Serial.println(BackSensor);
+  //Serial.println("");
+  //delay(100);
 
-  difference = FrontSensor - BackSensor;
+  /*difference = FrontSensor - BackSensor;
 
   if (difference > newHigh)
   {
@@ -111,30 +112,24 @@ void loop() {
   {
     newLow = difference;
   }
-  
-  /*Serial.print("new high = ");
-  Serial.println(newHigh);
-  Serial.print("new low = ");
-  Serial.println(newLow); */
-  //Serial.println(difference);
-  //delay(100); 
-
+  */
  
-  if (difference < -20 )
+  if (FrontSensor < 50 )
   {
     isOccupied = 1;
     toSend = 1;
     //Serial.println("Forward IN");
     //Serial.println("");
-    delay(2000);
+    //delay(2000);
   }
+  /*
   else if (difference > 20)
   {
     isOccupied = 1;
     toSend = 2;
     //Serial.println("Backward OUT");
     //Serial.println("");
-    delay(2000);
+    //delay(2000);
   }
   if (isOccupied == 1 && ((FrontSensor - BackSensor < 10) || (BackSensor - FrontSensor < 10)))
   {
@@ -142,7 +137,7 @@ void loop() {
     //Serial.println("RESET"); 
     //Serial.println("");
   } 
-
+ */
 
   mesh.update();
 
