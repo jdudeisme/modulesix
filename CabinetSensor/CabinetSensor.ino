@@ -7,10 +7,26 @@
 //
 //************************************************************
 #include "painlessMesh.h"
+#include <ESP32Servo.h>
 
 #define   MESH_PREFIX     "TheBees"
 #define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
+#define   INIT_DELAY      240000
+
+int DELAY = INIT_DELAY;
+int counter = 0;
+
+Servo myServo1;
+int pos1 = 0;
+
+int servoPin1 = 26;
+
+Servo myServo2;
+int pos2 = 0;
+
+int servoPin2 = 27;
+int delayTime = 50;
 
 const int CABINET = 34;
 bool prevVal = false;
@@ -33,7 +49,8 @@ void sendMessage() {
   }
   else {
     prevVal = opened;
-    opened = true; 
+    opened = true;
+    counter = 0;
   } 
 
   if (prevVal != opened) {
@@ -51,19 +68,45 @@ void sendMessage() {
 // Needed for painless library
 void receivedCallback( uint32_t from, String &msg ) {
   Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
-  switch(from) { // checking where the message came from 
-    case 0:
-      // statements
+  switch(msg.c_str) { // checking where the message came from 
+    case "Microwave On":
+      DELAY = DELAY * 0.5;
       break;
-    case 1: 
+    /*case "Microwave Off": 
       // statements
+      break;*/
+    case "Fridge Touched":
+      DELAY = DELAY * 1.5;
       break;
-    case 2:
+    /*case "Fridge Released": 
       // statements
+    */
+    case "IN"
+      knock();
       break;
-    case 3: 
-      // statements
-      break;
+  }
+}
+
+void knock(){
+  int i = 0;
+
+  while (i < 30){
+    myServo1.write(180);
+
+    delay(delayTime);
+
+    myServo2.write(180);  
+
+    delay(delayTime);
+
+    myServo1.write(175);
+
+    delay(delayTime);
+  
+    myServo2.write(162);
+
+    delay(delayTime);
+    i++;
   }
 }
 
@@ -83,6 +126,19 @@ void setup() {
   Serial.begin(115200);
 
   pinMode(CABINET, INPUT);
+
+  pinMode(servoPin1, OUTPUT);
+  pinMode(servoPin2, OUTPUT);
+
+  myServo1.setPeriodHertz(50);
+  myServo1.attach(servoPin1);
+
+  myServo2.setPeriodHertz(50);
+  myServo2.attach(servoPin2);
+
+  myServo1.write(180);
+  myServo2.write(180);
+  delay(15);
 //mesh.setDebugMsgTypes( ERROR | MESH_STATUS | CONNECTION | SYNC | COMMUNICATION | GENERAL | MSG_TYPES | REMOTE ); // all types on
   mesh.setDebugMsgTypes( ERROR | STARTUP );  // set before init() so that you can see startup messages
 
@@ -98,4 +154,14 @@ void setup() {
 
 void loop() {
   mesh.update();
+  delay(1);
+  counter++;
+  if(counter >= DELAY){
+    knock();
+    knock();
+    knock();
+    //on heaven's dOoOooorr
+    counter = 0;
+    DELAY = INIT_DELAY;
+  }
 }
