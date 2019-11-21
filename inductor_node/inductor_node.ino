@@ -12,10 +12,10 @@
 #define   MESH_PASSWORD   "TheHiveLives"
 #define   MESH_PORT       5555
 
-int ind_pin = 15;
-float lastFive[5] = {0,0,0,0,0};
-int fiveInd = 0;
-float diff = 200.0;
+int ind_pin = 36;
+//float lastFive[5] = {0,0,0,0,0};
+//int fiveInd = 0;
+//float diff = 200.0;
 int wasOn= 0;
 int toSend = 0;
 
@@ -32,30 +32,32 @@ void sendMessage() {
   float avg = (lastFive[0] + lastFive[1] + lastFive[2] + lastFive[3] + lastFive[4])/5;
 
   String msg = "Microwave ";
-  lastFive[fiveInd] = analogRead(ind_pin);
-  fiveInd = (fiveInd + 1) %5;
+  float val = analogRead(ind_pin);
+  //Serial.print("Message Sent: " + String(val) + "\n");
+  //lastFive[fiveInd] = val;
+  //fiveInd = (fiveInd + 1) %5;
   
-  if(wasOn == 0 && abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
-    abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff){
+  if(val > 0 && wasOn == 0 ){ //&& abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
+    //abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff){
       wasOn = 1;
       msg += "On";
       toSend = 1;
     }
-  else if(wasOn == 1 && !(abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
-    abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff)){
+  else if(val == 0 && wasOn == 1){// && !(abs(lastFive[0] - avg) < diff && abs(lastFive[1] - avg) < diff && abs(lastFive[2] - avg) < diff &&
+    //abs(lastFive[3] - avg) < diff && abs(lastFive[4] - avg) < diff)){
       wasOn = 0;
       msg += "Off";
       toSend = 1;
     }
   
   //msg += mesh.getNodeId();
-  float val = analogRead(ind_pin);
-  msg += val;
+  //float val = analogRead(ind_pin);
+  //msg += val;
   if(toSend == 1){
     mesh.sendBroadcast( msg );
     toSend = 0;
   }
-  taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+  taskSendMessage.setInterval(random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
 // Needed for painless library
@@ -90,7 +92,7 @@ void setup() {
   userScheduler.addTask( taskSendMessage );
   taskSendMessage.enable();
 
-  pinMode(15, INPUT);
+  pinMode(ind_pin, INPUT);
 }
 
 void loop() {
@@ -98,4 +100,5 @@ void loop() {
   mesh.update();
   //Serial.print(String(analogRead(ind_pin)) + "\n");
   //Serial.print("still runnin'\n");
+  
 }
