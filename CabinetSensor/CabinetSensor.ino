@@ -54,8 +54,10 @@ void sendMessage() {
   } 
 
   if (prevVal != opened) {
-    if (opened)
+    if (opened){
       msg = "Open";
+      DELAY = INIT_DELAY;
+    }
     else
       msg = "Closed";
     
@@ -68,23 +70,23 @@ void sendMessage() {
 // Needed for painless library
 void receivedCallback( uint32_t from, String &msg ) {
   Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
-  switch(msg.c_str) { // checking where the message came from 
-    case "Microwave On":
-      DELAY = DELAY * 0.5;
-      break;
+   // checking where the message came from 
+    if(msg.equals("Microwave On"))
+      DELAY = (int)DELAY * 0.5;
+
     /*case "Microwave Off": 
       // statements
       break;*/
-    case "Fridge Touched":
-      DELAY = DELAY * 1.5;
-      break;
+    if(msg.equals("Fridge Touch"))
+      DELAY = (int)DELAY * 1.5;
+
     /*case "Fridge Released": 
       // statements
     */
-    case "IN"
+    if(msg.equals("IN"))
       knock();
-      break;
-  }
+
+  
 }
 
 void knock(){
@@ -155,13 +157,12 @@ void setup() {
 void loop() {
   mesh.update();
   delay(1);
-  counter++;
-  if(counter >= DELAY){
+  DELAY--;
+  if(DELAY == 0){
     knock();
     knock();
     knock();
     //on heaven's dOoOooorr
-    counter = 0;
     DELAY = INIT_DELAY;
   }
 }
