@@ -7,6 +7,8 @@
 const int Fridge = 4;
 int valFridge = 0;
 
+int flipper = 0;
+
 Scheduler userScheduler; // to control your personal task
 painlessMesh mesh;
 
@@ -17,35 +19,33 @@ Task taskSendMessage( TASK_SECOND * 1 , TASK_FOREVER, &sendMessage );
 
 void sendMessage() {
   //Update message here 
-  String msg = " Jordy ";
+  String msg = "";
+  //String msg2 = "";
   //msg += mesh.getNodeId();
-  msg += valFridge; 
-  if (valFridge < 20 ){
-    msg += " Touched";
-  }else{
-    msg += " Released";
+
+  if (valFridge < 15 ){
+    flipper = 1;
+    msg = "Touched";
+    mesh.sendBroadcast(msg);
+    Serial.println(valFridge);
+  //taskSendMessage.setInterval(1);
+    //msg2 += "Touched";
+  }else if (flipper == 1){
+    flipper = 0;
+    msg = "Released";
+    Serial.println(valFridge);
+    mesh.sendBroadcast(msg);
+    //msg2 += "Released";
   }
-  mesh.sendBroadcast( msg );
-  taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
+  //mesh.sendBroadcast( msg );
+  //taskSendMessage.setInterval( random( TASK_SECOND * 1, TASK_SECOND * 5 ));
 }
 
 // Needed for painless library
 void receivedCallback( uint32_t from, String &msg ) {
-  Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
-  switch(from) { // checking where the message came from 
-    case 0:
-      // statements
-      break;
-    case 1: 
-      // statements
-      break;
-    case 2:
-      // statements
-      break;
-    case 3: 
-      // statements
-      break;
-  }
+  //Serial.printf("startHere: Received from %u msg=%s\n", from, msg.c_str());
+  Serial.println(msg.c_str());
+
 }
 
 void newConnectionCallback(uint32_t nodeId) {
@@ -81,8 +81,9 @@ void setup() {
 
 void loop() {
   // it will run the user scheduler as well
-  mesh.update();
   valFridge = touchRead(Fridge);
+  mesh.update();
+  
   //Serial.println(valFridge);
   delay(200);
   
