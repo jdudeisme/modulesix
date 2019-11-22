@@ -33,5 +33,6 @@ When using PainlessMesh, each ESP32 has a unique node identifier. By knowing ahe
 Our simulator script was written in Python (simulator.py), while all the other files were programmed in the Arduino IDE for the ESP32. 
   
  
-
+## Zoo Ambience
+The ZooSpeaker.scd file interperts all of the messages coming the mesh network through serial communication.
 
